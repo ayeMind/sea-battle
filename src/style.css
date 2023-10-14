@@ -1,0 +1,76 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.main-container {
+  background-color: darkslategrey;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  color: white;
+  position: absolute;
+  top: 28px;
+  font-size: 67px;
+}
+
+.field-text {
+  color: white;
+  font-size: 47px;
+}
+
+.flex-x-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.game {
+  display: flex;
+  gap: 25vh;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
+  border: 10px solid black;
+  padding: 2px;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
+}
+
+.cell {
+  appearance: none;
+  width: 45px;
+  height: 45px;
+  background-color: white;
+}
+
+.cell:checked {
+  background-color: red; /* Цвет фона для выбранного чекбокса */
+  border-color: white; /* Цвет границы для выбранного чекбокса */
+}
+
+.start {
+  appearance: none;
+  background-color: aquamarine;
+  padding: 2px;
+  border-radius: 0.3rem;
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 200px;
+  height: 50px;
+  font-size: large;
+}
