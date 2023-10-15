@@ -21,8 +21,11 @@ function handleClick(event: any) {
     }
     sessionStorage.setItem("your_field", JSON.stringify(newField))
 }
+
+
 export default function createField(fieldParent: Element, field: number[][] | null = null) {
 
+    // Game Field
     if (field) {
         console.log(field);
 
@@ -31,6 +34,7 @@ export default function createField(fieldParent: Element, field: number[][] | nu
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'cell';
+                checkbox.onclick = () => false;
 
                 //for some reason not all elements are 0 or 1
                 if (field[row][col] > 0) {
@@ -42,6 +46,7 @@ export default function createField(fieldParent: Element, field: number[][] | nu
         }
     }
 
+    // Initializaion field
     else {
         for (let row = 0; row < numberOfRows; row++) {
             for (let col = 0; col < numberOfColumns; col++) {

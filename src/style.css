@@ -38,16 +38,11 @@
 .field {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  gap: 8px;
+  gap: 4px;
   border: 10px solid black;
   padding: 2px;
 }
 
-.field {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 8px;
-}
 
 .cell {
   appearance: none;
