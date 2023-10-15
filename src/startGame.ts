@@ -4,29 +4,29 @@ let currentPlayer: number;
 
 function currentTurn(currentPlayer: number) {
   if (currentPlayer == null) return '';
-  else if (currentPlayer == 0) return 'Ход первого игрока';
-  else return 'Ход второго игрока'
+  else if (currentPlayer == 0) return "First player's turn ";
+  else return "Second player's turn"
 }
 
 export default function startGame(field: number[][]) {
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <div class="main-container">
-      <p class="title">Морской бой</p>   
+      <p class="title">Sea Battle</p>   
       <div class="game">
         <div class="flex-x-center">
-          <p class="field-text">Ваше поле</p>
+          <p class="field-text">Your field</p>
           <div class="field your-field">
           </div>
         </div>
   
         
         <div class="flex-x-center">
-          <p class="field-text">Поле попуска</p>
+          <p class="field-text">Enemy field</p>
           <div class="field enemy-field">
           </div>
         </div>
         <div class='turn'>
-          <p>Ожидание второго игрока</p>
+          <p>Waiting for the second player</p>
         </div>
       </div>
     </div>
