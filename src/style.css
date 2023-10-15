@@ -49,11 +49,17 @@
   width: 45px;
   height: 45px;
   background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.cell:checked {
-  background-color: red; /* Цвет фона для выбранного чекбокса */
-  border-color: white; /* Цвет границы для выбранного чекбокса */
+.ship {
+  background-color: wheat;
+}
+
+.active {
+  background-color: red;
 }
 
 .start {

@@ -25,5 +25,5 @@ export default function startGame(field: number[][]) {
     const enemyField = document.querySelector('.enemy-field');
   
     if (yourField) createField(yourField, field)
-    if (enemyField) createField(enemyField)
+    if (enemyField) createField(enemyField, null, "enemy")
   }

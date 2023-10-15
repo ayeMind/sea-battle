@@ -3,9 +3,12 @@ import validateField from './validateField.ts';
 import startGame from './startGame.ts';
 
 function handleStart() {
-    console.log(sessionStorage.your_field);
     
-    if (!validateField(JSON.parse(sessionStorage.your_field))) alert("ЭЭЭЭЭЭЭ! АХУЕЛ?")
+    if (!validateField(JSON.parse(sessionStorage.your_field))) {
+      alert("Неправильная расстановка!")
+      console.log(sessionStorage.your_field);
+      
+    }
     else {
       startGame(JSON.parse(sessionStorage.your_field))
     }
@@ -29,5 +32,5 @@ export default function initShips() {
     })
   
     const field = document.querySelector('.field');
-    if (field) createField(field)
+    if (field) createField(field, null, "init")
   }
