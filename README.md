@@ -2,5 +2,5 @@
 
 Still in development.
 
-Educational project (Python websockets + TS Frontend)
+Educational project. Learn backend (fastAPI, websockets) and some frontend (typescript)
 
