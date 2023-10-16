@@ -8,57 +8,62 @@ import htmlApp from './htmlApp';
 
 let turnText = document.querySelector(".turn");
 
-function togglePlayer() {
-  sessionStorage.current_player = Math.abs(1 - parseInt(sessionStorage.current_player)).toString()
-  if (turnText) turnText.innerHTML = `
-    <p>${currentTurn(parseInt(sessionStorage.current_player))}</p>
-  `
-}
 
-function turn(websocket: WebSocket) {
-  const enemyCells = document.querySelectorAll('.enemy')
-
-  if (sessionStorage.player === sessionStorage.current_player ) {
-      enemyCells.forEach((elem) => {
-        (elem as HTMLElement).onclick = checkShip;
-      })
-    }
-
-  else {
-    enemyCells.forEach((elem) => {
-      (elem as HTMLElement).onclick = null;
-    });
-  }
-
-  websocket.send()
-}
-
-
-
-function checkShip(event: any) {
-  
-  if (event.target.dataset.clicked) {
-    return;
-  }
-
-  if (event.target.dataset.ship === '1') {
-      const checkedShip = createElement(X)
-      event.target.appendChild(checkedShip)
-      event.target.className = 'cell enemy ship'
-  }
-
-  else {
-      const checkedDot = createElement(Dot)
-      event.target.appendChild(checkedDot);
-  }
-  
-  event.target.dataset.clicked = true;
-  togglePlayer()
-  turn()
-}
 
 
 export default function startGame(field: number[][]) {
+
+  function togglePlayer() {
+    sessionStorage.current_player = Math.abs(1 - parseInt(sessionStorage.current_player)).toString()
+    if (turnText) turnText.innerHTML = `
+      <p>${currentTurn(parseInt(sessionStorage.current_player))}</p>
+    `
+  }
+  
+  function turn(websocket: WebSocket, data: any) {
+    const enemyCells = document.querySelectorAll('.enemy')
+  
+    if (sessionStorage.player === sessionStorage.current_player ) {
+        enemyCells.forEach((elem) => {
+          (elem as HTMLElement).onclick = checkShip;
+        })
+      }
+  
+    else {
+      enemyCells.forEach((elem) => {
+        (elem as HTMLElement).onclick = null;
+      });
+    }
+  
+    websocket.send(data)
+    console.log('something sent');
+    
+  }
+  
+  function checkShip(event: any) {
+    
+    if (event.target.dataset.clicked) {
+      return;
+    }
+  
+    if (event.target.dataset.ship === '1') {
+        const checkedShip = createElement(X)
+        event.target.appendChild(checkedShip)
+        event.target.className = 'cell enemy ship'
+    }
+  
+    else {
+        const checkedDot = createElement(Dot)
+        event.target.appendChild(checkedDot);
+    }
+    
+    event.target.dataset.clicked = true;
+    togglePlayer()
+    turn(ws, event.target)
+  }
+  
+
+  
 
   htmlApp('game')
 
@@ -68,6 +73,7 @@ export default function startGame(field: number[][]) {
   if (yourField) createField(yourField, field)
 
   let ws = new WebSocket("ws://localhost:8000/game");
+
 
   turnText = document.querySelector(".turn");
   ws.addEventListener("open", () => {
@@ -86,7 +92,6 @@ export default function startGame(field: number[][]) {
 
       else if (!response.init) {
         console.log("Move!");
-        turn(ws)
       }
 
       else if (response.init) {
