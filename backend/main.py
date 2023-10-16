@@ -75,13 +75,13 @@ class ConnectionManager:
 
                 self.secondField = await websocket.receive_json()
                 await websocket.send_json({
-                    "player": 0,
-                    "field": self.firstField
+                    "player": 1,
+                    "enemy_field": self.firstField
                 })
 
                 await self.active_connections[0].send_json({
-                    "player": 1,
-                    "field": self.secondField
+                    "player": 0,
+                    "enemy_field": self.secondField
                 })
 
 
@@ -113,7 +113,10 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_json()
             if len(manager.active_connections) == 2:
-                pass
+                await websocket.send_json({
+                    'init': False,
+                    'message': 'move'
+                })
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)

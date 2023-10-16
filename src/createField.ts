@@ -46,13 +46,12 @@ export default async function createField(fieldParent: Element, field: number[][
     // Game Field
     else if (who === 'you' && field) {
 
-        console.log("your", field);
-
         for (let row = 0; row < numberOfRows; row++) {
             for (let col = 0; col < numberOfColumns; col++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
                 cell.onclick = () => false
+                
                 //for some reason not all elements are 0 or 1
                 if (field[row][col] > 0) {
                     cell.dataset.ship = '1';
@@ -73,7 +72,7 @@ export default async function createField(fieldParent: Element, field: number[][
                 cell.dataset.col = col.toString();
                 cell.onclick = handleClick;
                 fieldParent.appendChild(cell);
-
+                
             }
         }
     }
