@@ -1,6 +1,5 @@
-import checkShip from "./checkShip";
 
-export default function replaceEnemyField(field: number[][]) {
+export default function setEnemyField(field: number[][]) {
     const numberOfColumns = 10
     const numberOfRows = 10
     const enemyField = document.querySelector('.enemy-field');
@@ -19,7 +18,6 @@ export default function replaceEnemyField(field: number[][]) {
             if (field[row][col] === 1) {
                 cell.dataset.ship = '1'
             }
-            cell.onclick = checkShip
             enemyField.appendChild(cell);
         }
     }

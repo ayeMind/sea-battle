@@ -1,6 +1,7 @@
 import createField from './createField.ts'
 import validateField from './validateField.ts';
 import startGame from './startGame.ts';
+import htmlApp from './htmlApp.ts';
 
 function handleStart() {
     
@@ -15,16 +16,8 @@ function handleStart() {
   }
 
 export default function initShips() {
-    document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-    <div class="main-container">
-      <p class="title">Create your own arrangement</p>   
-      <div class="game">
-        <div class="field">
-        </div>
-        <button class="start">Start</button>
-      </div>
-    </div>
-  `;
+    
+    htmlApp('init')
   
     const btn = document.querySelector<HTMLButtonElement>('.start')
     if (btn) btn.addEventListener("click", () => {

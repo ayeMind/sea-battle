@@ -1,4 +1,3 @@
-import checkShip from "./checkShip";
 
 const numberOfRows = 10;
 const numberOfColumns = 10;
@@ -33,6 +32,7 @@ function handleClick(event: any) {
 
 export default async function createField(fieldParent: Element, field: number[][] | null = null, who: string = "you") {
 
+    // Enemy prepare field
     if (who === 'enemy') {
 
         for (let row = 0; row < numberOfRows; row++) {

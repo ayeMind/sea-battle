@@ -1,3 +1,4 @@
+import json
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from typing_extensions import Annotated
@@ -16,33 +17,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-class Field(BaseModel):
-    field_id: int
-    field: list[list[int]] = Query(..., description="2D array with a maximum size of 10x10", max_items=10)
-
-
-default_field = {
-    "field_id": 1,
-    "field":[[0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 1, 0, 1, 1, 1, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-}
-
-@app.get("/game")
-def get_field(field_id: Annotated[int, Query(description="0 - first player's field, 1 - second player's field")] = 1):
-    return default_field
-
-@app.post("/game")
-def post_field(field_id: Annotated[int, Query(description="0 - first player's field, 1 - second player's field")] = 1):
-    return default_field
-
 
 class ConnectionManager:
     def __init__(self):
@@ -84,13 +58,18 @@ class ConnectionManager:
                     "enemy_field": self.secondField
                 })
 
-
-
                 await self.active_connections[0].send_json({
                     'init': True,
                     'player': 0,
-                    'message': 'Your turn'
+                    'message': 'you turn'
                 })
+
+                await self.active_connections[0].send_json({
+                    'init': False,
+                    'player': 0,
+                    'message': 'move'
+                })
+
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
@@ -111,7 +90,8 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_json()
+            data = await websocket.receive_json() 
+            response = json.loads(data)
             if len(manager.active_connections) == 2:
                 await websocket.send_json({
                     'init': False,
