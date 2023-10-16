@@ -47,6 +47,8 @@ def post_field(field_id: Annotated[int, Query(description="0 - first player's fi
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
+        self.firstField = None
+        self.secondField = None
 
     async def connect(self, websocket: WebSocket):
         if len(self.active_connections) >= 2:
@@ -61,12 +63,29 @@ class ConnectionManager:
                     'player': 0,
                     'message': 'Waiting for another player'
                 })
+
+                self.firstField = await websocket.receive_json()
+                
             else:
                 await websocket.send_json({
                     'init': True,
                     'player': 1,
                     'message': 'Ready?'
                 })
+
+                self.secondField = await websocket.receive_json()
+                await websocket.send_json({
+                    "player": 0,
+                    "field": self.firstField
+                })
+
+                await self.active_connections[0].send_json({
+                    "player": 1,
+                    "field": self.secondField
+                })
+
+
+
                 await self.active_connections[0].send_json({
                     'init': True,
                     'player': 0,
@@ -93,6 +112,8 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_json()
-            await websocket.send_json(data)
+            if len(manager.active_connections) == 2:
+                pass
+
     except WebSocketDisconnect:
         manager.disconnect(websocket)

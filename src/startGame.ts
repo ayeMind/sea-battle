@@ -47,9 +47,15 @@ export default function startGame(field: number[][]) {
 
   const turnText = document.querySelector(".turn");
   ws.addEventListener("open", (event) => {
-    ws.onmessage = (e) => {
-      const response = JSON.parse(e.data)
+    ws.send(sessionStorage.your_field)
+
+    ws.onmessage = async (e) => {
+      const response = await JSON.parse(e.data)
       console.log(response);
+      if (response.field) {
+        console.log("It's work!!!");
+        sessionStorage.setItem("enemy_field", response)
+      }
       if (response.init) {
         console.log(response.player, response.message);
         if (response.message != "Waiting for another player") {
