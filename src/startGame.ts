@@ -1,4 +1,5 @@
 import createField from "./createField";
+import replaceEnemyField from "./replaceEnemyField";
 
 let currentPlayer: number;
 
@@ -54,7 +55,8 @@ export default function startGame(field: number[][]) {
       console.log(response);
       if (response.field) {
         console.log("It's work!!!");
-        sessionStorage.setItem("enemy_field", response)
+        sessionStorage.setItem("enemy_field", JSON.stringify(response))
+        replaceEnemyField(response.field)
       }
       if (response.init) {
         console.log(response.player, response.message);

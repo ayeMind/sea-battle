@@ -34,22 +34,11 @@ function handleClick(event: any) {
 export default async function createField(fieldParent: Element, field: number[][] | null = null, who: string = "you") {
 
     if (who === 'enemy') {
-        const enemyFieldPromise = await fetch("http://127.0.0.1:8000/game?field_id=1")
-        const response = await enemyFieldPromise.json()
-        const enemyField = response.field
-        console.log(enemyField);
-
-        console.log("enemy", response.field);
 
         for (let row = 0; row < numberOfRows; row++) {
             for (let col = 0; col < numberOfColumns; col++) {
                 const cell = document.createElement('div');
-                cell.className = 'cell enemy';
-                if (enemyField[row][col] === 1) {
-                    cell.dataset.ship = '1'
-                }
-
-                cell.onclick = checkShip
+                cell.className = 'cell enemy prepare';
                 fieldParent.appendChild(cell);
             }
         }
