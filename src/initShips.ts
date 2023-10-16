@@ -17,11 +17,11 @@ function handleStart() {
 export default function initShips() {
     document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <div class="main-container">
-      <p class="title">Создай свою расстановку</p>   
+      <p class="title">Create your own arrangement</p>   
       <div class="game">
         <div class="field">
         </div>
-        <button class="start">Начать</button>
+        <button class="start">Start</button>
       </div>
     </div>
   `;

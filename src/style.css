@@ -4,7 +4,7 @@
 }
 
 .main-container {
-  background-color: darkslategrey;
+  background-color: teal;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -14,7 +14,7 @@
 .title {
   color: white;
   position: absolute;
-  top: 28px;
+  top: 31px;
   font-size: 67px;
 }
 
@@ -39,7 +39,7 @@
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 4px;
-  border: 10px solid black;
+  border: 8px solid black;
   padding: 2px;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .active {
-  background-color: red;
+  background-color: wheat;
 }
 
 .start {
@@ -74,4 +74,13 @@
   width: 200px;
   height: 50px;
   font-size: large;
+}
+
+.turn {
+  position: absolute;
+  bottom: 31px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  font-size: 44px;
+  color: aliceblue;
 }
