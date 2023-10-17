@@ -3,8 +3,10 @@ import createField from "./createField";
 import setEnemyField from "./setEnemyField";
 import currentTurn from "./currentTurn";
 import htmlApp from './htmlApp';
+import isShipDestroyed from './isShipDestroyed';
 
 let turnText = document.querySelector(".turn");
+const checkList: any = [];
 
 export default function startGame(field: number[][]) {
 
@@ -39,6 +41,8 @@ export default function startGame(field: number[][]) {
       const checkedShip = createElement(X)
       event.target.appendChild(checkedShip)
       event.target.className = 'cell enemy ship'
+      const coords = JSON.parse(event.target.dataset.coords)
+      console.log(isShipDestroyed(coords, JSON.parse(sessionStorage.enemy_field).enemy_field, checkList));
     }
 
     else {
