@@ -20,17 +20,12 @@ export default function startGame(field: number[][]) {
 
     const enemyCells = document.querySelectorAll('.enemy')
 
-    if (sessionStorage.player === sessionStorage.current_player) {
-      enemyCells.forEach((elem) => {
-        (elem as HTMLElement).onclick = checkShip;
-      })
-    }
+    enemyCells.forEach((elem) => {
+      (elem as HTMLElement).onclick = checkShip;
+    })
 
-    else {
-      enemyCells.forEach((elem) => {
-        (elem as HTMLElement).onclick = null;
-      });
-    }
+
+
 
   }
 
@@ -40,10 +35,11 @@ export default function startGame(field: number[][]) {
       return;
     }
 
-    if (sessionStorage.current_player !== sessionStorage.player) {
-      ws.send("change")
-      return;
-    }
+    const enemyCells = document.querySelectorAll('.enemy')
+
+    enemyCells.forEach((elem) => {
+      (elem as HTMLElement).onclick = null;
+    });
 
     if (event.target.dataset.ship === '1') {
       const checkedShip = createElement(X)
@@ -57,10 +53,10 @@ export default function startGame(field: number[][]) {
     }
 
     event.target.dataset.clicked = true;
-    togglePlayer()
     if (ws.OPEN) {
-      ws.send(event.target)
+      ws.send(event.target.dataset.coords)
       console.log("something sent");
+      togglePlayer()
     }
   }
 
@@ -89,9 +85,14 @@ export default function startGame(field: number[][]) {
         setPlayerText()
       }
 
-      else if (!response.init) {
+      else if (response.message === 'move') {
         console.log("Move!");
+        if (sessionStorage.current_player !== sessionStorage.player) {
+          
+          togglePlayer()
+        }
         turn()
+        
       }
 
       else if (response.init) {

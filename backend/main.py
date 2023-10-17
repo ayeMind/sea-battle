@@ -84,16 +84,23 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-
 @app.websocket("/game")
 async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
+    await manager.connect(websocket) 
+
     try:
         while True:
-            data = await websocket.receive_json() 
-            response = json.loads(data)
+            data = await websocket.receive()
+            await manager.broadcast(data)
+            # response = json.loads(data)
             if len(manager.active_connections) == 2:
-                await websocket.send_json({
+                 
+                if manager.active_connections[0] == websocket:
+                    enemyWebsocket = manager.active_connections[1]
+                else:
+                    enemyWebsocket = manager.active_connections[0]
+
+                await enemyWebsocket.send_json({
                     'init': False,
                     'message': 'move'
                 })
