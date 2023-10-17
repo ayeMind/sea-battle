@@ -16,7 +16,7 @@ export default function setEnemyField(field: number[][]) {
             const cell = document.createElement('div');
             cell.dataset.coords = JSON.stringify([row, col])
             cell.className = 'cell enemy';
-            if (field[row][col] === 1) {
+            if (field[row][col] === 1) {    
                 cell.dataset.ship = '1'
             }
             enemyField.appendChild(cell);

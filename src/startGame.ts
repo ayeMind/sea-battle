@@ -2,7 +2,6 @@ import { createElement, Dot, X } from 'lucide'
 import createField from "./createField";
 import setEnemyField from "./setEnemyField";
 import currentTurn from "./currentTurn";
-import setPlayerText from './setPlayerText';
 import htmlApp from './htmlApp';
 
 let turnText = document.querySelector(".turn");
@@ -12,7 +11,7 @@ export default function startGame(field: number[][]) {
   function togglePlayer() {
     sessionStorage.current_player = Math.abs(1 - parseInt(sessionStorage.current_player)).toString()
     if (turnText) turnText.innerHTML = `
-      <p>${currentTurn(parseInt(sessionStorage.current_player))}</p>
+      <p>${currentTurn()}</p>
     `
   }
 
@@ -23,9 +22,6 @@ export default function startGame(field: number[][]) {
     enemyCells.forEach((elem) => {
       (elem as HTMLElement).onclick = checkShip;
     })
-
-
-
 
   }
 
@@ -58,7 +54,7 @@ export default function startGame(field: number[][]) {
         console.log("something sent");
         togglePlayer()
       }
-      
+
     }
   }
 
@@ -84,7 +80,6 @@ export default function startGame(field: number[][]) {
         sessionStorage.setItem("enemy_field", JSON.stringify(response))
         sessionStorage.setItem("player", response.player)
         setEnemyField(response.enemy_field)
-        setPlayerText()
       }
 
       else if (response.message === 'move') {
@@ -102,7 +97,7 @@ export default function startGame(field: number[][]) {
         if (response.message != "Waiting for another player") {
           sessionStorage.setItem("current_player", "0")
           if (turnText) turnText.innerHTML = `
-              <p>${currentTurn(parseInt(sessionStorage.current_player))}</p>
+              <p>${currentTurn()}</p>
           `
         }
       }
