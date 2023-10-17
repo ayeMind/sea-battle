@@ -50,6 +50,7 @@ export default async function createField(fieldParent: Element, field: number[][
             for (let col = 0; col < numberOfColumns; col++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
+                cell.dataset.coords = JSON.stringify([row, col])
                 cell.onclick = () => false
                 
                 //for some reason not all elements are 0 or 1

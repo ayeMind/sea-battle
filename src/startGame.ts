@@ -104,6 +104,22 @@ export default function startGame(field: number[][]) {
           `
         }
       }
+
+      else if (response.coords) {
+        console.log("beda", response.coords);
+        const selectedCell = document.querySelector(`[data-coords="${response.coords.text}"]`) as HTMLElement;
+        if (selectedCell.dataset.ship === '1') {
+          const checkedShip = createElement(X)
+          selectedCell.appendChild(checkedShip)
+          selectedCell.className = 'cell ship'
+        }
+    
+        else {
+          const checkedDot = createElement(Dot)
+          selectedCell.appendChild(checkedDot);
+        }
+
+      }
     }
   });
 

@@ -74,8 +74,10 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    async def send_coords(self, message: str, websocket: WebSocket):
+        await websocket.send_json({
+            "coords": message
+        })
 
     async def broadcast(self, data: str):
         for connection in self.active_connections:
@@ -91,7 +93,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive()
-            await manager.broadcast(data)
+            # await manager.broadcast(data)
             # response = json.loads(data)
             if len(manager.active_connections) == 2:
                  
@@ -99,6 +101,8 @@ async def websocket_endpoint(websocket: WebSocket):
                     enemyWebsocket = manager.active_connections[1]
                 else:
                     enemyWebsocket = manager.active_connections[0]
+
+                await manager.send_coords(data, enemyWebsocket)
 
                 await enemyWebsocket.send_json({
                     'init': False,
