@@ -5,11 +5,7 @@ import currentTurn from "./currentTurn";
 import setPlayerText from './setPlayerText';
 import htmlApp from './htmlApp';
 
-
 let turnText = document.querySelector(".turn");
-
-
-
 
 export default function startGame(field: number[][]) {
 
@@ -19,51 +15,54 @@ export default function startGame(field: number[][]) {
       <p>${currentTurn(parseInt(sessionStorage.current_player))}</p>
     `
   }
-  
-  function turn(websocket: WebSocket, data: any) {
+
+  function turn() {
+
     const enemyCells = document.querySelectorAll('.enemy')
-  
-    if (sessionStorage.player === sessionStorage.current_player ) {
-        enemyCells.forEach((elem) => {
-          (elem as HTMLElement).onclick = checkShip;
-        })
-      }
-  
+
+    if (sessionStorage.player === sessionStorage.current_player) {
+      enemyCells.forEach((elem) => {
+        (elem as HTMLElement).onclick = checkShip;
+      })
+    }
+
     else {
       enemyCells.forEach((elem) => {
         (elem as HTMLElement).onclick = null;
       });
     }
-  
-    websocket.send(data)
-    console.log('something sent');
-    
+
   }
-  
+
   function checkShip(event: any) {
-    
+
     if (event.target.dataset.clicked) {
       return;
     }
-  
+
+    if (sessionStorage.current_player !== sessionStorage.player) {
+      ws.send("change")
+      return;
+    }
+
     if (event.target.dataset.ship === '1') {
-        const checkedShip = createElement(X)
-        event.target.appendChild(checkedShip)
-        event.target.className = 'cell enemy ship'
+      const checkedShip = createElement(X)
+      event.target.appendChild(checkedShip)
+      event.target.className = 'cell enemy ship'
     }
-  
+
     else {
-        const checkedDot = createElement(Dot)
-        event.target.appendChild(checkedDot);
+      const checkedDot = createElement(Dot)
+      event.target.appendChild(checkedDot);
     }
-    
+
     event.target.dataset.clicked = true;
     togglePlayer()
-    turn(ws, event.target)
+    if (ws.OPEN) {
+      ws.send(event.target)
+      console.log("something sent");
+    }
   }
-  
-
-  
 
   htmlApp('game')
 
@@ -92,6 +91,7 @@ export default function startGame(field: number[][]) {
 
       else if (!response.init) {
         console.log("Move!");
+        turn()
       }
 
       else if (response.init) {
@@ -101,7 +101,7 @@ export default function startGame(field: number[][]) {
           if (turnText) turnText.innerHTML = `
               <p>${currentTurn(parseInt(sessionStorage.current_player))}</p>
           `
-        } 
+        }
       }
     }
   });
