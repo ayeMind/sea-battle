@@ -35,11 +35,9 @@ export default function startGame(field: number[][]) {
       return;
     }
 
-    const enemyCells = document.querySelectorAll('.enemy')
+    event.target.dataset.clicked = true;
 
-    enemyCells.forEach((elem) => {
-      (elem as HTMLElement).onclick = null;
-    });
+    const enemyCells = document.querySelectorAll('.enemy')
 
     if (event.target.dataset.ship === '1') {
       const checkedShip = createElement(X)
@@ -48,15 +46,19 @@ export default function startGame(field: number[][]) {
     }
 
     else {
+
       const checkedDot = createElement(Dot)
       event.target.appendChild(checkedDot);
-    }
+      enemyCells.forEach((elem) => {
+        (elem as HTMLElement).onclick = null;
+      });
 
-    event.target.dataset.clicked = true;
-    if (ws.OPEN) {
-      ws.send(event.target.dataset.coords)
-      console.log("something sent");
-      togglePlayer()
+      if (ws.OPEN) {
+        ws.send(event.target.dataset.coords)
+        console.log("something sent");
+        togglePlayer()
+      }
+      
     }
   }
 
