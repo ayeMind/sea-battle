@@ -51,13 +51,22 @@ export default function startGame(field: number[][]) {
           "destroyedShip": cellsWithoutShip
         }))
         cellsWithoutShip = []
+        if (!sessionStorage.getItem("destroyed_count"))
+          sessionStorage.setItem("destroyed_count", "1");
+        else
+          sessionStorage.destroyed_count = (parseInt(sessionStorage.destroyed_count)+1).toString();
+        
+        if (sessionStorage.destroyed_count === "10") {
+          alert("Ты выиграл!")
+          ws.close()
+        }
       }
       if (ws.OPEN) {
         ws.send(JSON.stringify({
           "isShip": true,
           "coords": event.target.dataset.coords
         }))
-      
+
       }
     }
 
@@ -138,9 +147,19 @@ export default function startGame(field: number[][]) {
 
       else if (response.destroyedShip) {
         addDotsOnDestroyShips(JSON.parse(response.destroyedShip.text).destroyedShip, "you");
+        if (!sessionStorage.getItem("destroyed_your_count"))
+          sessionStorage.setItem("destroyed_your_count", "1");
+        else
+          sessionStorage.destroyed_your_count = (parseInt(sessionStorage.destroyed_your_count)+1).toString()
+
+          
+        if (sessionStorage.destroyed_your_count === "10") {
+          alert("Ты проиграл")
+          ws.close()
+        }
       }
     }
   });
 
-  if (enemyField) createField(enemyField, null, "enemy")
+  if (enemyField) createField(enemyField, null, "enemy");
 }

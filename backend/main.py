@@ -70,8 +70,9 @@ class ConnectionManager:
                 })
 
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    def disconnect(self):
+        for connection in self.active_connections:
+            self.active_connections.remove(connection)
 
     async def send_coords(self, message: str, websocket: WebSocket):
         await websocket.send_json({
@@ -91,7 +92,7 @@ class ConnectionManager:
 
 
 manager = ConnectionManager()
-                
+
 @app.websocket("/game")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket) 
@@ -112,7 +113,7 @@ async def websocket_endpoint(websocket: WebSocket):
             
             elif isinstance(json.loads(data.get("text")), dict):
                 await manager.send_destroyed_ships(data, enemyWebsocket)
-
+                
             else:
                 await manager.send_coords(data, enemyWebsocket)
                 await enemyWebsocket.send_json({
@@ -121,4 +122,4 @@ async def websocket_endpoint(websocket: WebSocket):
                 })
 
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        manager.disconnectAll()
