@@ -11,91 +11,117 @@ export default function isShipDestroyed(
     selectedCoordinate: Coordinate,
     field: number[][],
     checkList: Coordinate[],
-    visited: Coordinate[] | null = null,
+    cellsToDot: Coordinate[],
     direction: Direction = null,
-    cellsWithoutShip: Coordinate[] = []
+    isNotFirst = false,
 ): boolean {
     let [row, col] = selectedCoordinate;
 
-    function checkNeighbours() {
-        if (direction === "left" || direction === "right") {
-            if (row !== 0 && row !== 9) {
-                cellsWithoutShip.push([row + 1, col], [row - 1, col]);
+    let correctDirections: Direction[] = [];
+    function checkDotsCoords(row: number, col: number, onlyDirect: Direction = null, isFirst: boolean = false) {
+
+        let y = row
+        let x = col
+
+        if (isFirst) {
+
+            if (x > 0 && field[y][x - 1] === 1) correctDirections.push("left")
+            if (x < 9 && field[y][x + 1] === 1) correctDirections.push("right")
+            if (y > 0 && field[y - 1][x] === 1) correctDirections.push("top")
+            if (y < 9 && field[y + 1][x] === 1) correctDirections.push("down")
+
+            if (correctDirections.includes("left") || (correctDirections.includes("right"))) {
+                if (y > 0) cellsToDot.push([y - 1, x])
+                if (y < 9) cellsToDot.push([y + 1, x])
             }
-            else if (row !== 9) {
-                cellsWithoutShip.push([row + 1, col]);
+
+            if (correctDirections.includes("top") || correctDirections.includes("down")) {
+                if (x > 0) cellsToDot.push([y, x - 1])
+                if (x < 9) cellsToDot.push([y, x + 1])
             }
             else {
-                cellsWithoutShip.push([row - 1, col])
+                correctDirections.push("left", "top", "right", "down")
             }
         }
 
-        if (direction === "down" || direction === "top") {
-            if (col !== 0 && col !== 9) {
-                cellsWithoutShip.push([row, col + 1], [row, col - 1]);
-            }
-            else if (col !== 9) {
-                cellsWithoutShip.push([row, col + 1]);
-            }
-            else {
-                cellsWithoutShip.push([row, col - 1])
-            }
+
+        for (let direct of correctDirections) {
+
+            if (direct === "top" && (isFirst || onlyDirect === "top")) {
+                if (y > 0 && field[y][x] === 1) {
+                    if (x > 0) cellsToDot.push([y - 1, x - 1]);
+                    if (x < 9) cellsToDot.push([y - 1, x + 1]);
+                    if (field[y-1][x] !== 1) cellsToDot.push([y-1, x]);
+                    
+                    checkDotsCoords(y - 1, x, "top");
+                }
+            } else if (direct === "down" && (isFirst || onlyDirect === "down")) {
+                if (y < 9 && field[y][x] === 1) {
+                    if (x > 0) cellsToDot.push([y + 1, x - 1]);
+                    if (x < 9) cellsToDot.push([y + 1, x + 1]);
+                    if (field[y + 1][x] !== 1) cellsToDot.push([y+1, x]);
+            
+                    checkDotsCoords(y + 1, x, "down");
+                }
+            } else if (direct === "left" && (isFirst || onlyDirect === "left")) {
+                if (x > 0 && field[y][x] === 1) {
+                    if (y > 0) cellsToDot.push([y - 1, x - 1]);
+                    if (y < 9) cellsToDot.push([y + 1, x - 1]);
+                    if (field[y][x-1] !== 1) cellsToDot.push([y, x-1]);
+                
+                    checkDotsCoords(y, x - 1, "left");
+                }
+            } else if (direct === "right" && (isFirst || onlyDirect === "right")) {
+                if (x < 9 && field[y][x] === 1) {
+                    if (y > 0) cellsToDot.push([y - 1, x + 1]);
+                    if (y < 9) cellsToDot.push([y + 1, x + 1]);
+                    if (field[y][x+1] !== 1) cellsToDot.push([y, x+1]);
+                 
+                    checkDotsCoords(y, x + 1, "right");
+                }
+            }            
         }
     }
 
+    // First approach (recursive) 
+    if (!isNotFirst) {
+        checkList.push(selectedCoordinate)  
 
-    if (!visited) {
-        checkList.push(selectedCoordinate)
-        visited = [selectedCoordinate]
-        if (
-            (row === 0 || isShipDestroyed([row - 1, col], field, checkList, visited, "top", cellsWithoutShip)) &&
-            (row === 9 || isShipDestroyed([row + 1, col], field, checkList, visited, "down", cellsWithoutShip)) &&
-            (col === 0 || isShipDestroyed([row, col - 1], field, checkList, visited, "left", cellsWithoutShip)) &&
-            (col === 9 || isShipDestroyed([row, col + 1], field, checkList, visited, "right", cellsWithoutShip))
-        ) {
-            addDotsOnDestroyShips(cellsWithoutShip, "enemy")
+        if ((row === 0 || isShipDestroyed([row - 1, col], field, checkList, cellsToDot, "top", true)) &&
+            (row === 9 || isShipDestroyed([row + 1, col], field, checkList, cellsToDot, "down", true)) &&
+            (col === 0 || isShipDestroyed([row, col - 1], field, checkList, cellsToDot, "left", true)) &&
+            (col === 9 || isShipDestroyed([row, col + 1], field, checkList, cellsToDot, "right", true))) {
+
+            checkDotsCoords(row, col, null, true)
+            addDotsOnDestroyShips(cellsToDot, "enemy");
             return true;
         }
-        else return false;
     }
 
+    // Next approaches
+    else if (isNotFirst) {
 
-    else if (visited) {
-        if (isInArray(visited, selectedCoordinate)) {
-            checkNeighbours()
-            return false;
+        if (field[row][col] !== 1) {
+            return true;
         }
 
-        const cell = field[row][col];
-        if (cell === 1) {
-            if (!isInArray(checkList, selectedCoordinate)) {
+        else if (field[row][col] === 1) {
+
+            if (!isInArray(checkList, [row, col])) {
                 return false;
             }
+
+            switch (direction) {
+                case "top":
+                    return row === 0 || isShipDestroyed([row - 1, col], field, checkList, cellsToDot, "top", true)
+                case "down":
+                    return row === 9 || isShipDestroyed([row + 1, col], field, checkList, cellsToDot, "down", true)
+                case "left":
+                    return col === 0 || isShipDestroyed([row, col - 1], field, checkList, cellsToDot, "left", true)
+                case "right":
+                    return col === 9 || isShipDestroyed([row, col + 1], field, checkList, cellsToDot, "right", true)
+            }
         }
-
-        else if (cell !== 1) {
-            cellsWithoutShip.push(selectedCoordinate)
-            checkNeighbours()
-            return true;
-        }
-
-        if (row === 0 || (direction === "top" && isShipDestroyed([row - 1, col], field, checkList, visited, "top"))) {
-            return true;
-        }
-
-        if (row === 9 || (direction === "down" && isShipDestroyed([row + 1, col], field, checkList, visited, "down"))) {
-            return true;
-        }
-
-        if (col === 0 || (direction === "left" && isShipDestroyed([row, col - 1], field, checkList, visited, "left"))) {
-            return true;
-        }
-
-        if (col === 9 || (direction === "right" && isShipDestroyed([row, col + 1], field, checkList, visited, "right"))) {
-            return true;
-        }
-
-
     }
     return false;
 }

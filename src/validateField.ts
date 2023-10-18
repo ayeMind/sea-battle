@@ -1,6 +1,5 @@
 export default function validateField(field: number[][]) {
     
-    return true
     const hit = (row: number, col: number) =>
       (row < 0 || col < 0 || row > 9 || col > 9) ? 0 : field[row][col];
   

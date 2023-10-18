@@ -17,7 +17,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
@@ -56,12 +55,12 @@ class ConnectionManager:
                 await self.active_connections[0].send_json({
                     "player": 0,
                     "enemy_field": self.secondField
-                })
+                })  
 
                 await self.active_connections[0].send_json({
                     'init': True,
                     'player': 0,
-                    'message': 'you turn'
+                    'message': 'you turns'
                 })
 
                 await self.active_connections[0].send_json({

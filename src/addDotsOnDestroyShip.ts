@@ -2,8 +2,8 @@ import { createElement, Dot } from 'lucide'
 
 type Player = "you" | "enemy"
 
-export default function addDotsOnDestroyShips(cellsWithoutShip: number[][], who: Player) {
-    cellsWithoutShip.forEach((cell) => {
+export default function addDotsOnDestroyShips(cellsWithoutShip: any, who: Player) {
+    cellsWithoutShip.forEach((cell: any) => {
         const stringCell = JSON.stringify(cell)
         // console.log(cell);
         // console.log(stringCell);
@@ -13,6 +13,9 @@ export default function addDotsOnDestroyShips(cellsWithoutShip: number[][], who:
         else if (who === "you")
             queryCell = document.querySelector(`.your[data-coords="${stringCell}"]`);
         if (queryCell!.classList.contains("dot")) {
+            return true;
+        }
+        if ((queryCell as HTMLElement).dataset.ship) {
             return true;
         }
         queryCell!.classList.add("dot");

@@ -7,7 +7,6 @@ function handleStart() {
     
     if (!validateField(JSON.parse(sessionStorage.your_field))) {
       alert("Неправильная расстановка!")
-      console.log(sessionStorage.your_field);
       
     }
     else {

@@ -45,10 +45,10 @@ export default function startGame(field: number[][]) {
       event.target.appendChild(checkedShip)
       event.target.className = 'cell enemy ship'
       const coords = JSON.parse(event.target.dataset.coords)
-      const shipDestroyed = isShipDestroyed(coords, JSON.parse(sessionStorage.enemy_field).enemy_field, checkList, null, null, cellsWithoutShip);
+      const shipDestroyed = isShipDestroyed(coords, JSON.parse(sessionStorage.enemy_field).enemy_field, checkList, cellsWithoutShip);
       if (shipDestroyed) {
         ws.send(JSON.stringify({
-          "destroyedShip" : cellsWithoutShip
+          "destroyedShip": cellsWithoutShip
         }))
         cellsWithoutShip = []
       }
@@ -57,11 +57,7 @@ export default function startGame(field: number[][]) {
           "isShip": true,
           "coords": event.target.dataset.coords
         }))
-        console.log("sent success?", JSON.stringify({
-          "isShip": true,
-          "coords": event.target.dataset.coords
-        }));
-
+      
       }
     }
 
@@ -76,7 +72,6 @@ export default function startGame(field: number[][]) {
 
       if (ws.OPEN) {
         ws.send(event.target.dataset.coords)
-        console.log("something sent");
         togglePlayer()
       }
 
@@ -99,17 +94,14 @@ export default function startGame(field: number[][]) {
 
     ws.onmessage = async (e) => {
       const response = await JSON.parse(e.data);
-      console.log(response);
 
       if (response.enemy_field) {
-        console.log("It's work!!!");
         sessionStorage.setItem("enemy_field", JSON.stringify(response));
         sessionStorage.setItem("player", response.player);
         setEnemyField(response.enemy_field);
       }
 
       else if (response.message === 'move') {
-        console.log("Move!");
         if (sessionStorage.current_player !== sessionStorage.player) {
 
           togglePlayer();
@@ -119,7 +111,6 @@ export default function startGame(field: number[][]) {
       }
 
       else if (response.init) {
-        console.log(response.player, response.message);
         if (response.message != "Waiting for another player") {
           sessionStorage.setItem("current_player", "0")
           if (turnText) turnText.innerHTML = `
@@ -136,17 +127,18 @@ export default function startGame(field: number[][]) {
       }
 
       else if (response.coords) {
-        console.log("beda", response.coords);
         const selectedCell = document.querySelector(`[data-coords="${response.coords.text}"]`) as HTMLElement;
-        const checkedDot = createElement(Dot);
-        selectedCell.appendChild(checkedDot);
+        if (!selectedCell.classList.contains("dot")) {
+          selectedCell.classList.add("dot")
+          const checkedDot = createElement(Dot);
+          selectedCell.appendChild(checkedDot);
+        }
 
       }
 
-     else if (response.destroyedShip) {
-      console.log(response.destroyedShip.text);  
-      addDotsOnDestroyShips(JSON.parse(response.destroyedShip.text).destroyedShip, "you");
-     }
+      else if (response.destroyedShip) {
+        addDotsOnDestroyShips(JSON.parse(response.destroyedShip.text).destroyedShip, "you");
+      }
     }
   });
 
