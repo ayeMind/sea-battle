@@ -17,12 +17,12 @@ function handleClick(event: any) {
     if (!(event.target.dataset.ship === "1")) {
         event.target.dataset.ship = "1"
         newField[cellRow][cellCol] = 1
-        event.target.className = "cell active"
+        event.target.classList.add("active");
     }
     else {
         event.target.dataset.ship = "0"
         newField[cellRow][cellCol] = 0
-        event.target.classList.remove("active")
+        event.target.classList.remove("active");
     }
     sessionStorage.setItem("your_field", JSON.stringify(newField))
     // console.log(newField[cellRow][cellCol]);
@@ -49,14 +49,14 @@ export default async function createField(fieldParent: Element, field: number[][
         for (let row = 0; row < numberOfRows; row++) {
             for (let col = 0; col < numberOfColumns; col++) {
                 const cell = document.createElement('div');
-                cell.className = 'cell';
+                cell.className = 'cell your';
                 cell.dataset.coords = JSON.stringify([row, col])
                 cell.onclick = () => false
                 
                 //for some reason not all elements are 0 or 1
                 if (field[row][col] > 0) {
                     cell.dataset.ship = '1';
-                    cell.className = 'cell active'
+                    cell.className = 'cell your active'
                 }
                 fieldParent.appendChild(cell);
             }

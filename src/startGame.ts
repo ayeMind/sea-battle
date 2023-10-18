@@ -4,10 +4,11 @@ import setEnemyField from "./setEnemyField";
 import currentTurn from "./currentTurn";
 import htmlApp from './htmlApp';
 import isShipDestroyed from './isShipDestroyed';
+import addDotsOnDestroyShips from './addDotsOnDestroyShip';
 
 let turnText = document.querySelector(".turn");
 const checkList: any = [];
-const cellsWithoutShip: any = []
+let cellsWithoutShip: any = []
 
 
 export default function startGame(field: number[][]) {
@@ -44,12 +45,30 @@ export default function startGame(field: number[][]) {
       event.target.appendChild(checkedShip)
       event.target.className = 'cell enemy ship'
       const coords = JSON.parse(event.target.dataset.coords)
-      console.log(isShipDestroyed(coords, JSON.parse(sessionStorage.enemy_field).enemy_field, checkList, null, null, cellsWithoutShip));
+      const shipDestroyed = isShipDestroyed(coords, JSON.parse(sessionStorage.enemy_field).enemy_field, checkList, null, null, cellsWithoutShip);
+      if (shipDestroyed) {
+        ws.send(JSON.stringify({
+          "destroyedShip" : cellsWithoutShip
+        }))
+        cellsWithoutShip = []
+      }
+      if (ws.OPEN) {
+        ws.send(JSON.stringify({
+          "isShip": true,
+          "coords": event.target.dataset.coords
+        }))
+        console.log("sent success?", JSON.stringify({
+          "isShip": true,
+          "coords": event.target.dataset.coords
+        }));
+
+      }
     }
 
     else {
 
       const checkedDot = createElement(Dot)
+      event.target.className = 'cell enemy dot'
       event.target.appendChild(checkedDot);
       enemyCells.forEach((elem) => {
         (elem as HTMLElement).onclick = null;
@@ -69,33 +88,34 @@ export default function startGame(field: number[][]) {
   const yourField = document.querySelector('.your-field');
   const enemyField = document.querySelector('.enemy-field');
 
-  if (yourField) createField(yourField, field)
+  if (yourField) createField(yourField, field);
 
   let ws = new WebSocket("ws://localhost:8000/game");
 
 
   turnText = document.querySelector(".turn");
   ws.addEventListener("open", () => {
-    ws.send(sessionStorage.your_field)
+    ws.send(sessionStorage.your_field);
 
     ws.onmessage = async (e) => {
-      const response = await JSON.parse(e.data)
+      const response = await JSON.parse(e.data);
       console.log(response);
+
       if (response.enemy_field) {
         console.log("It's work!!!");
-        sessionStorage.setItem("enemy_field", JSON.stringify(response))
-        sessionStorage.setItem("player", response.player)
-        setEnemyField(response.enemy_field)
+        sessionStorage.setItem("enemy_field", JSON.stringify(response));
+        sessionStorage.setItem("player", response.player);
+        setEnemyField(response.enemy_field);
       }
 
       else if (response.message === 'move') {
         console.log("Move!");
         if (sessionStorage.current_player !== sessionStorage.player) {
-          
-          togglePlayer()
+
+          togglePlayer();
         }
         turn()
-        
+
       }
 
       else if (response.init) {
@@ -108,21 +128,25 @@ export default function startGame(field: number[][]) {
         }
       }
 
+      else if (response.isShip) {
+        const selectedCell = document.querySelector(`[data-coords="${response.coords}"]`) as HTMLElement;
+        const checkedShip = createElement(X);
+        selectedCell.appendChild(checkedShip);
+        selectedCell.className = 'cell ship';
+      }
+
       else if (response.coords) {
         console.log("beda", response.coords);
         const selectedCell = document.querySelector(`[data-coords="${response.coords.text}"]`) as HTMLElement;
-        if (selectedCell.dataset.ship === '1') {
-          const checkedShip = createElement(X)
-          selectedCell.appendChild(checkedShip)
-          selectedCell.className = 'cell ship'
-        }
-    
-        else {
-          const checkedDot = createElement(Dot)
-          selectedCell.appendChild(checkedDot);
-        }
+        const checkedDot = createElement(Dot);
+        selectedCell.appendChild(checkedDot);
 
       }
+
+     else if (response.destroyedShip) {
+      console.log(response.destroyedShip.text);  
+      addDotsOnDestroyShips(JSON.parse(response.destroyedShip.text).destroyedShip, "you");
+     }
     }
   });
 

@@ -79,13 +79,20 @@ class ConnectionManager:
             "coords": message
         })
 
-    async def broadcast(self, data: str):
-        for connection in self.active_connections:
-            await connection.send_json(data)
+    async def send_coords_with_ship(self, message: dict, websocket: WebSocket):
+        await websocket.send_json({
+            "isShip": True,
+            "coords": json.loads(message.get("text")).get("coords")
+        })
+
+    async def send_destroyed_ships(self, message, websocket: WebSocket):
+        await websocket.send_json({
+            "destroyedShip": message
+        })
 
 
 manager = ConnectionManager()
-
+                
 @app.websocket("/game")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket) 
@@ -94,7 +101,6 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive()
             # await manager.broadcast(data)
-            # response = json.loads(data)
             if len(manager.active_connections) == 2:
                  
                 if manager.active_connections[0] == websocket:
@@ -102,8 +108,14 @@ async def websocket_endpoint(websocket: WebSocket):
                 else:
                     enemyWebsocket = manager.active_connections[0]
 
-                await manager.send_coords(data, enemyWebsocket)
+            if isinstance(json.loads(data.get("text")), dict) and json.loads(data.get("text")).get("coords"):
+                await manager.send_coords_with_ship(data, enemyWebsocket)
+            
+            elif isinstance(json.loads(data.get("text")), dict):
+                await manager.send_destroyed_ships(data, enemyWebsocket)
 
+            else:
+                await manager.send_coords(data, enemyWebsocket)
                 await enemyWebsocket.send_json({
                     'init': False,
                     'message': 'move'

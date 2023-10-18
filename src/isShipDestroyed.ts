@@ -1,4 +1,4 @@
-import { createElement, Dot } from 'lucide'
+import addDotsOnDestroyShips from "./addDotsOnDestroyShip";
 
 type Coordinate = [number, number];
 type Direction = "right" | "top" | "left" | "down" | null;
@@ -16,7 +16,34 @@ export default function isShipDestroyed(
     cellsWithoutShip: Coordinate[] = []
 ): boolean {
     let [row, col] = selectedCoordinate;
-    
+
+    function checkNeighbours() {
+        if (direction === "left" || direction === "right") {
+            if (row !== 0 && row !== 9) {
+                cellsWithoutShip.push([row + 1, col], [row - 1, col]);
+            }
+            else if (row !== 9) {
+                cellsWithoutShip.push([row + 1, col]);
+            }
+            else {
+                cellsWithoutShip.push([row - 1, col])
+            }
+        }
+
+        if (direction === "down" || direction === "top") {
+            if (col !== 0 && col !== 9) {
+                cellsWithoutShip.push([row, col + 1], [row, col - 1]);
+            }
+            else if (col !== 9) {
+                cellsWithoutShip.push([row, col + 1]);
+            }
+            else {
+                cellsWithoutShip.push([row, col - 1])
+            }
+        }
+    }
+
+
     if (!visited) {
         checkList.push(selectedCoordinate)
         visited = [selectedCoordinate]
@@ -26,30 +53,19 @@ export default function isShipDestroyed(
             (col === 0 || isShipDestroyed([row, col - 1], field, checkList, visited, "left", cellsWithoutShip)) &&
             (col === 9 || isShipDestroyed([row, col + 1], field, checkList, visited, "right", cellsWithoutShip))
         ) {
-            cellsWithoutShip.forEach((cell) => {
-                const stringCell = JSON.stringify(cell)
-                // console.log(cell);
-                // console.log(stringCell);
-                const queryCell = document.querySelector(`.enemy[data-coords="${stringCell}"]`);
-                if (queryCell!.classList.contains("dot")) {
-                    return true;
-                }
-                (queryCell as HTMLElement)!.onclick = null;
-                const checkedDot = createElement(Dot);
-                queryCell!.className = "cell enemy dot";
-                queryCell!.appendChild(checkedDot);
-                
-            })
+            addDotsOnDestroyShips(cellsWithoutShip, "enemy")
             return true;
         }
         else return false;
     }
 
+
     else if (visited) {
         if (isInArray(visited, selectedCoordinate)) {
+            checkNeighbours()
             return false;
         }
-        
+
         const cell = field[row][col];
         if (cell === 1) {
             if (!isInArray(checkList, selectedCoordinate)) {
@@ -59,30 +75,7 @@ export default function isShipDestroyed(
 
         else if (cell !== 1) {
             cellsWithoutShip.push(selectedCoordinate)
-            if (direction === "left" || direction === "right") {
-                if (row !== 0 && row !== 9) {
-                    cellsWithoutShip.push([row + 1, col], [row - 1, col]);
-                }
-                else if (row !== 9) {
-                    cellsWithoutShip.push([row - 1, col]);
-                }
-                else {
-                    cellsWithoutShip.push([row + 1, col])
-                }
-            }
-
-            if (direction === "down" || direction === "top") {
-                if (col !== 0 && col !== 9) {
-                    cellsWithoutShip.push([row, col + 1], [row, col - 1]);
-                }
-                else if (col !== 9) {
-                    cellsWithoutShip.push([row, col - 1]);
-                }
-                else {
-                    cellsWithoutShip.push([row, col + 1])
-                }
-            }
-
+            checkNeighbours()
             return true;
         }
 
@@ -101,8 +94,8 @@ export default function isShipDestroyed(
         if (col === 9 || (direction === "right" && isShipDestroyed([row, col + 1], field, checkList, visited, "right"))) {
             return true;
         }
-        
-        
-        }
+
+
+    }
     return false;
 }
