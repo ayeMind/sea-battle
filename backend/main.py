@@ -3,6 +3,7 @@ from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from typing_extensions import Annotated
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 app = FastAPI()
 
@@ -123,3 +124,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
     except WebSocketDisconnect:
         manager.disconnectAll()
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", port=8000, host='0.0.0.0', reload=True)

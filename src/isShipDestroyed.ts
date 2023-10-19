@@ -25,10 +25,10 @@ export default function isShipDestroyed(
 
         if (isFirst) {
 
-            if (x > 0 && field[y][x - 1] === 1) correctDirections.push("left")
-            if (x < 9 && field[y][x + 1] === 1) correctDirections.push("right")
-            if (y > 0 && field[y - 1][x] === 1) correctDirections.push("top")
-            if (y < 9 && field[y + 1][x] === 1) correctDirections.push("down")
+            if (x > 0 && field[y][x - 1] === 1) correctDirections.push("right", "left")
+            if (x < 9 && field[y][x + 1] === 1) correctDirections.push("left", "right")
+            if (y > 0 && field[y - 1][x] === 1) correctDirections.push("down", "top")
+            if (y < 9 && field[y + 1][x] === 1) correctDirections.push("top", "down")
 
             if (correctDirections.includes("left") || (correctDirections.includes("right"))) {
                 if (y > 0) cellsToDot.push([y - 1, x])

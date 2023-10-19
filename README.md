@@ -1,8 +1,11 @@
 # sea-battle
 
-![image](https://github.com/ayeMind/sea-battle/assets/119005871/508db60b-5dd1-4ce1-9bcf-828e6f5d6612)
+![image](https://github.com/ayeMind/sea-battle/assets/119005871/9a1bf807-0cab-4465-82c3-d4a4b551ba2d)
 
-Still in development.
+## To run the frontend, you need to enter **pnpm run dev** in the console in the main directory
+## To start the server, just write **python main.py** in the backend directory.
 
 Educational project. Learn backend (fastAPI, websockets) and some frontend (typescript)
+
+Сompletely finished! 
 
