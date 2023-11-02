@@ -2,8 +2,8 @@ import { createElement, Dot } from 'lucide'
 
 type Player = "you" | "enemy"
 
-export default function addDotsOnDestroyShips(cellsWithoutShip: any, who: Player) {
-    cellsWithoutShip.forEach((cell: any) => {
+export default function addDotsOnDestroyShips(cellsWithoutShip: number[][], who: Player) {
+    cellsWithoutShip.forEach((cell: number[]) => {
         const stringCell = JSON.stringify(cell)
         // console.log(cell);
         // console.log(stringCell);

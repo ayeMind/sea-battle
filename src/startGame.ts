@@ -30,21 +30,23 @@ export default function startGame(field: number[][]) {
 
   }
 
-  function checkShip(event: any) {
+  function checkShip(event: MouseEvent) {
 
-    if (event.target.dataset.clicked) {
+    const cell = event.target as HTMLDivElement
+
+    if (cell.dataset.clicked || !cell.dataset.coords) {
       return;
     }
 
-    event.target.dataset.clicked = true;
+    cell.dataset.clicked = "1";
 
     const enemyCells = document.querySelectorAll('.enemy')
 
-    if (event.target.dataset.ship === '1') {
+    if (cell.dataset.ship === '1') {
       const checkedShip = createElement(X)
-      event.target.appendChild(checkedShip)
-      event.target.className = 'cell enemy ship'
-      const coords = JSON.parse(event.target.dataset.coords)
+      cell.appendChild(checkedShip)
+      cell.className = 'cell enemy ship'
+      const coords = JSON.parse(cell.dataset.coords)
       const shipDestroyed = isShipDestroyed(coords, JSON.parse(sessionStorage.enemy_field).enemy_field, checkList, cellsWithoutShip);
       if (shipDestroyed) {
         ws.send(JSON.stringify({
@@ -64,7 +66,7 @@ export default function startGame(field: number[][]) {
       if (ws.OPEN) {
         ws.send(JSON.stringify({
           "isShip": true,
-          "coords": event.target.dataset.coords
+          "coords": cell.dataset.coords
         }))
 
       }
@@ -73,14 +75,14 @@ export default function startGame(field: number[][]) {
     else {
 
       const checkedDot = createElement(Dot)
-      event.target.className = 'cell enemy dot'
-      event.target.appendChild(checkedDot);
+      cell.className = 'cell enemy dot'
+      cell.appendChild(checkedDot);
       enemyCells.forEach((elem) => {
         (elem as HTMLElement).onclick = null;
       });
 
       if (ws.OPEN) {
-        ws.send(event.target.dataset.coords)
+        ws.send(cell.dataset.coords)
         togglePlayer()
       }
 

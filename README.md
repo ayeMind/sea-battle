@@ -1,10 +1,18 @@
 # sea-battle
 
-![image](https://github.com/ayeMind/sea-battle/assets/119005871/9a1bf807-0cab-4465-82c3-d4a4b551ba2d)
+![изображение](https://github.com/ayeMind/sea-battle/assets/119005871/b0559936-e043-4b91-ab59-76b238431ead)
 
-To run the frontend, you need to enter ***pnpm run dev*** in the console in the main directory. <br />
-To start the server, just enter ***python main.py*** in the console in backend directory.
+Run the project locally:
 
-Educational project. FastAPI websockets.
-Сompletely finished! 
+```bash
+  # At the root of the directory (frontend)
+  pnpm i
+  pnpm run dev
 
+  # At the backend directory
+  poetry i
+  poetry shell
+  python main.py
+```
+
+Educational project. Сompletely finished! (websockets)
