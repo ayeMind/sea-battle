@@ -1,17 +1,22 @@
 import { createElement, Dot, X } from 'lucide'
-import createField from "./createField";
-import setEnemyField from "./setEnemyField";
-import currentTurn from "./currentTurn";
-import htmlApp from './htmlApp';
-import isShipDestroyed from './isShipDestroyed';
-import addDotsOnDestroyShips from './addDotsOnDestroyShip';
+import createField from "../functions/createField";
+import setEnemyField from "../functions/setEnemyField";
+import currentTurn from "../functions/currentTurn";
+import htmlApp from '../htmlApp';
+import isShipDestroyed from '../functions/isShipDestroyed';
+import addDotsOnDestroyShips from '../functions/addDotsOnDestroyShip';
+import startMenu from './startMenu';
 
 let turnText = document.querySelector(".turn");
 const checkList: any = [];
 let cellsWithoutShip: any = []
 
+let gameId = 0;
+if (sessionStorage.game_id) {
+  gameId = parseInt(sessionStorage.game_id)
+}
 
-export default function startGame(field: number[][]) {
+export default function startGame(field: number[][], theme:string) {
 
   function togglePlayer() {
     sessionStorage.current_player = Math.abs(1 - parseInt(sessionStorage.current_player)).toString()
@@ -59,8 +64,9 @@ export default function startGame(field: number[][]) {
           sessionStorage.destroyed_count = (parseInt(sessionStorage.destroyed_count)+1).toString();
         
         if (sessionStorage.destroyed_count === "10") {
-          alert("Ты выиграл!")
+          alert("You won!")
           ws.close()
+          startMenu();
         }
       }
       if (ws.OPEN) {
@@ -89,14 +95,14 @@ export default function startGame(field: number[][]) {
     }
   }
 
-  htmlApp('game')
+  htmlApp('game', theme)
 
   const yourField = document.querySelector('.your-field');
   const enemyField = document.querySelector('.enemy-field');
 
   if (yourField) createField(yourField, field);
 
-  let ws = new WebSocket("ws://localhost:8000/game");
+  let ws = new WebSocket(`ws://localhost:8000/game/${gameId}`);
 
 
   turnText = document.querySelector(".turn");
@@ -112,13 +118,19 @@ export default function startGame(field: number[][]) {
         setEnemyField(response.enemy_field);
       }
 
+      
+      else if (response.message === 'disconnect') {
+        alert("The opponent left")
+        ws.close();
+        startMenu();
+      }
+
       else if (response.message === 'move') {
         if (sessionStorage.current_player !== sessionStorage.player) {
 
           togglePlayer();
         }
         turn()
-
       }
 
       else if (response.init) {
@@ -156,8 +168,9 @@ export default function startGame(field: number[][]) {
 
           
         if (sessionStorage.destroyed_your_count === "10") {
-          alert("Ты проиграл")
-          ws.close()
+          alert("You lose");
+          ws.close();
+          startMenu();
         }
       }
     }

@@ -1,5 +1,5 @@
 import json
-from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, WebSocket
 from pydantic import BaseModel
 from typing_extensions import Annotated
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +18,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
@@ -25,22 +27,23 @@ class ConnectionManager:
         self.secondField = None
 
     async def connect(self, websocket: WebSocket):
-        if len(self.active_connections) >= 2:
-            await websocket.accept()
-            await websocket.close(4000)
-        else:
-            await websocket.accept()
-            self.active_connections.append(websocket)
-            if len(self.active_connections) == 1:
-                await websocket.send_json({
-                    'init': True,
-                    'player': 0,
-                    'message': 'Waiting for another player'
-                })
+        await websocket.accept()
+        self.active_connections.append(websocket)
 
+        if len(self.active_connections) % 2 == 1:
+            await websocket.send_json({
+                'init': True,
+                'player': 0,
+                'message': 'Waiting for another player'
+            })
+
+            try:
                 self.firstField = await websocket.receive_json()
-                
-            else:
+            except:
+                await websocket.receive_text()
+
+        else:
+            try:
                 await websocket.send_json({
                     'init': True,
                     'player': 1,
@@ -48,6 +51,7 @@ class ConnectionManager:
                 })
 
                 self.secondField = await websocket.receive_json()
+
                 await websocket.send_json({
                     "player": 1,
                     "enemy_field": self.firstField
@@ -56,7 +60,7 @@ class ConnectionManager:
                 await self.active_connections[0].send_json({
                     "player": 0,
                     "enemy_field": self.secondField
-                })  
+                })
 
                 await self.active_connections[0].send_json({
                     'init': True,
@@ -70,10 +74,13 @@ class ConnectionManager:
                     'message': 'move'
                 })
 
+            except:
+                await self.active_connections[0].send_json({
+                    "message": "join"})
+                self.active_connections = []
 
-    def disconnect(self):
-        for connection in self.active_connections:
-            self.active_connections.remove(connection)
+    def disconnectAll(self):
+        self.active_connections = []
 
     async def send_coords(self, message: str, websocket: WebSocket):
         await websocket.send_json({
@@ -94,16 +101,16 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@app.websocket("/game")
-async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket) 
 
+@app.websocket("/game/{game_id}")
+async def websocket_endpoint(websocket: WebSocket, game_id: int):
+    await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive()
             # await manager.broadcast(data)
             if len(manager.active_connections) == 2:
-                 
+
                 if manager.active_connections[0] == websocket:
                     enemyWebsocket = manager.active_connections[1]
                 else:
@@ -111,10 +118,10 @@ async def websocket_endpoint(websocket: WebSocket):
 
             if isinstance(json.loads(data.get("text")), dict) and json.loads(data.get("text")).get("coords"):
                 await manager.send_coords_with_ship(data, enemyWebsocket)
-            
+
             elif isinstance(json.loads(data.get("text")), dict):
                 await manager.send_destroyed_ships(data, enemyWebsocket)
-                
+
             else:
                 await manager.send_coords(data, enemyWebsocket)
                 await enemyWebsocket.send_json({
@@ -122,8 +129,13 @@ async def websocket_endpoint(websocket: WebSocket):
                     'message': 'move'
                 })
 
-    except WebSocketDisconnect:
-        manager.disconnectAll()
+    except:
+        if len(manager.active_connections) > 0:
+            manager.disconnectAll()
+            await enemyWebsocket.send_json({
+                'init': False,
+                'message': 'disconnect'
+            })
 
 
 if __name__ == "__main__":

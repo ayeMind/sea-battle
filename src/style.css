@@ -3,12 +3,73 @@
   padding: 0;
 }
 
+input {
+  outline: none;
+  width: 188px;
+  font-size: 52px;
+  display: flex;
+  text-align: center;
+}
+
 .main-container {
-  background-color: #002b36;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.main-theme {
+  background-color: teal;
+}
+
+.sub-theme {
+  background-color: #002b36;
+}
+
+.menu {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 14px;
+  color: white;
+}
+
+.text-xl {
+  font-size: 52px;
+}
+
+.join {
+  appearance: none;
+  background-color: aquamarine;
+  padding: 2px;
+  border-radius: 1rem;
+  width: 200px;
+  height: 70px;
+  font-size: x-large;
+}
+
+.start-btn {
+  appearance: none;
+  background-color: aquamarine;
+  padding: 2px;
+  border-radius: 1rem;
+  width: 400px;
+  height: 70px;
+  font-size: x-large;
+}
+
+.theme-change {
+  appearance: none;
+  background-color: aquamarine;
+  padding: 2px;
+  border-radius: 1rem;
+  width: 200px;
+  height: 70px;
+  font-size: x-large;
+  position: absolute;
+  bottom: 14px;
 }
 
 .title {
